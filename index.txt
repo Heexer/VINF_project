@@ -2,8 +2,8 @@
 # each file consists of two lines: first line contains indexes and second path to the file
 # empty line above file path means, there is no indexing for the given file
 # TOTAL SIZE of testing dataset: 11,79 GB
-#1,4,6,8,9,10
-#wiki_test_foods.xml
+1,4,6,8,9,10
+wiki_test_foods.xml
 #121088,145227
 #enwiki-latest-pages-articles-multistream12.xml-p8554860p9172788
 #115401,235848

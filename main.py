@@ -11,20 +11,35 @@ ENERGYCONVERSION = 4.1868
 
 class Food:
 
-    def __init__(self, name, energy, protein, fat, carbs):
+    def __init__(self, name, energy, protein, fat, carbs, magnesium, iron, sodium, thiamin, riboflavin, niacin):
         self.name = name
         self.energy = energy
         self.protein = protein
         self.fat = fat
         self. carbs = carbs
+        self.magnesium = magnesium
+        self.iron = iron
+        self.sodium = sodium
+        self.thiamin = thiamin
+        self.riboflavin = riboflavin
+        self.niacin = niacin
 
     def print_data(self):
         print("{}: {:.2f}, {:.2f}, {:.2f}, {:.2f}".format(self.name, self.energy, self.protein, self.fat, self.carbs))
 
     def get_data(self):
-        return self.name, self.energy, self.protein, self.fat, self.carbs
+        return self.name, self.energy, self.protein, self.fat, self.carbs, self.magnesium, self.iron, self.sodium, self.thiamin, self.riboflavin, self.niacin
 
 
+
+def create_table():
+    new_table = PrettyTable()
+    new_table.title = "Nutrients"
+    # new_table.add_row = ["Macronutrients", "Minerals", "Vitamins"]
+    new_table.field_names = [' ', 'Food', 'Calories(kcal)', 'Protein(g)', 'Fat(g)', 'Carbohydrates(g)',
+                            'Magnesium(mg)', 'Iron(mg)', 'Sodium(mg)',
+                            'Thiamine(mg)', 'Riboflavin(mg)', 'Niacin(mg)']
+    return new_table
 
 
 def recalculate_energy(original_value):
@@ -60,8 +75,11 @@ def analyze_page(new_page):
 
         # Energy, Protein, Fat, Carbohydrates regexes:
         data_regexes = [r'(kJ|kj|kcal)\s*=\s*([^\s]+)', r'protein\s*=\s*([^\s]+).g',
-                        r'fat\s*=\s*([^\s]+).g', r'(carbs|carbohydrates)\s*=\s*([^\s]+).g']
-        data = [None, None, None, None]  
+                        r'fat\s*=\s*([^\s]+).g', r'(carbs|carbohydrates)\s*=\s*([^\s]+).g',
+                        r'magnesium\_mg\s*=\s*.*?([0-9]+\.?[0-9]+|[0-9]+)', r'iron\_mg\s*=\s*.*?([0-9]+\.?[0-9]+|[0-9]+)',
+                        r'sodium\_mg\s*=\s*.*?([0-9]+\.?[0-9]+|[0-9]+)', r'thiamin\_mg\s*=\s*.*?([0-9]+\.?[0-9]+|[0-9]+)',
+                        r'riboflavin\_mg\s*=\s*.*?([0-9]+\.?[0-9]+|[0-9]+)', r'niacin\_mg\s*=\s*.*?([0-9]+\.?[0-9]+|[0-9]+)']
+        data = [None, None, None, None, None, None, None, None, None, None]  
 
 
         if re.search(name_reg, new_page):   # Name
@@ -82,7 +100,9 @@ def analyze_page(new_page):
                 counter += 1
 
         if name is not None and check_data_contents(data):
-            return Food(name=name, energy=data[0], protein=data[1], fat=data[2], carbs=data[3])
+            return Food(name=name, energy=data[0], protein=data[1], fat=data[2], carbs=data[3],
+                        magnesium=data[4], iron=data[5], sodium=data[6], 
+                        thiamin=data[7], riboflavin=data[8], niacin=data[9])
         else:
             return None
 
@@ -175,8 +195,20 @@ with open('index.txt', 'r', encoding='utf8') as paths:
     #     food.print_data()
     #     cntr += 1
 
+        # self.magnesium = magnesium
+        # self.iron = iron
+        # self.sodium = sodium
+        # self.thiamin = thiamin
+        # self.riboflavin = riboflavin
+        # self.niacin = niacin
+
     cntr = 1
-    table = PrettyTable([' ', 'Food', 'Calories(kcal)', 'Protein(g)', 'Fat(g)', 'Carbohydrates(g)'])
+
+
+    table = create_table()
+
+
+
     for food in foods:
         table.add_row((cntr,) + food.get_data())
         cntr += 1
