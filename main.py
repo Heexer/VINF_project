@@ -1,6 +1,9 @@
 # Vyhľadávanie informácií projekt
 
-import  multiprocessing
+# import  multiprocessing
+
+# from pyspark import SparkContext as sc
+from pyspark.sql import SparkSession
 
 import re
 import time
@@ -109,7 +112,8 @@ def analyze_page(new_page):
             
 
 
-def analyze_file(file_path, index_list, indexing = True):
+# def analyze_file(file_path, index_list, indexing = True):
+def analyze_file(file_path, index_list = None, indexing = True):
 
     print(file_path)
 
@@ -152,26 +156,27 @@ def analyze_file(file_path, index_list, indexing = True):
 # CTRL + K + U = multiline uncomment
 # CMD + Shift + P => kill all terminals
 
+# pool = multiprocessing.Pool(multiprocessing.cpu_count())
 
 
-with open('index.txt', 'r', encoding='utf8') as paths:
-
+with open('index.txt', 'r', encoding='utf8') as file:
+    
+    file_data = [[], []] # paths array, indexes array
     foods = []
     index = True
     start = time.time()
 
-    # pool = multiprocessing.Pool(multiprocessing.cpu_count())
+    for line in file:
 
-    for path in paths:
+        if line[0] != '#':
 
-        if path[0] != '#':
-
-            path = path.rstrip('\n')
+            path = line.rstrip('\n')
 
             if index:
                 if len(path) != 0:
                     indexes = [int(x) for x in path.split(',')]
-                    # print(indexes)
+                    file_data[1].append(indexes)
+                    print(indexes)
                 else:
                     indexes = None
 
@@ -179,35 +184,28 @@ with open('index.txt', 'r', encoding='utf8') as paths:
 
             else:
                 path = define_source_path(path)
-                tmp_foods = analyze_file(path, indexes) # Add False to the function call for indexing to be disabled
-                # tmp_foods = pool.map(analyze_file, path)
-
-                for food in tmp_foods:
-                    foods.append(food)
+                file_data[0].append(path)
 
                 index = True
+
+
+    # print(file_data)
+
+    spark = SparkSession.builder.appName('vinf_project').master('local').getOrCreate()
+    rdd = spark.sparkContext.parallelize(file_data[0])
+    tmp_foods_rdd = rdd.map(analyze_file)
+
+    for arr in tmp_foods_rdd.collect():
+        for food in arr:
+            foods.append(food)
+
+
     
     end = time.time()
 
-    # cntr = 1
-    # for food in foods:
-    #     print('{}. '.format(cntr), end='')
-    #     food.print_data()
-    #     cntr += 1
-
-        # self.magnesium = magnesium
-        # self.iron = iron
-        # self.sodium = sodium
-        # self.thiamin = thiamin
-        # self.riboflavin = riboflavin
-        # self.niacin = niacin
-
     cntr = 1
 
-
     table = create_table()
-
-
 
     for food in foods:
         table.add_row((cntr,) + food.get_data())
@@ -217,7 +215,65 @@ with open('index.txt', 'r', encoding='utf8') as paths:
     print("Total elapsed time: {:.2f} s".format(end - start))
 
 
-    # print(foods[1].get_data2('name'))
+
+
+
+
+
+
+
+# with open('index.txt', 'r', encoding='utf8') as paths:
+
+#     foods = []
+#     index = True
+#     start = time.time()
+
+#     # pool = multiprocessing.Pool(multiprocessing.cpu_count())
+
+#     for path in paths:
+
+#         if path[0] != '#':
+
+#             path = path.rstrip('\n')
+
+#             if index:
+#                 if len(path) != 0:
+#                     indexes = [int(x) for x in path.split(',')]
+#                     # print(indexes)
+#                 else:
+#                     indexes = None
+
+#                 index = False
+
+#             else:
+#                 path = define_source_path(path)
+#                 # sc.parallelize(path)
+#                 tmp_foods = analyze_file(path, indexes) # Add False to the function call for indexing to be disabled
+#                 # tmp_foods = pool.map(analyze_file, path)
+
+#                 for food in tmp_foods:
+#                     foods.append(food)
+
+#                 index = True
+    
+#     end = time.time()
+
+#     cntr = 1
+
+
+#     table = create_table()
+
+
+
+#     for food in foods:
+#         table.add_row((cntr,) + food.get_data())
+#         cntr += 1
+#     print(table)
+
+#     print("Total elapsed time: {:.2f} s".format(end - start))
+
+
+
 
 # without indexing = 131s
 # with indexing = 105s

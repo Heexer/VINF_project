@@ -16,8 +16,8 @@ wiki_test_foods.xml
 #enwiki-latest-pages-articles-multistream16.xml-p18960153p20460152
 #6363
 #enwiki-latest-pages-articles-multistream25.xml-p60025656p61525655
-#59543,116630,159907
-#enwiki-latest-pages-articles-multistream23.xml-p46288942p47788941
+59543,116630,159907
+enwiki-latest-pages-articles-multistream23.xml-p46288942p47788941
 389,2609,3971,4330,11157,13532,13555,15563,21488,24249,24320,25686,25688
 enwiki-latest-pages-articles-multistream1.xml-p1p41242
 3350,3549,3550,6682,7881,7970,8426,9099,9461,10060,10543,11764,14796,17088,17874,21940,22513,30613
