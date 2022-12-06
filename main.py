@@ -27,8 +27,8 @@ class Food:
         self.riboflavin = riboflavin
         self.niacin = niacin
 
-    def print_data(self):
-        print("{}: {:.2f}, {:.2f}, {:.2f}, {:.2f}".format(self.name, self.energy, self.protein, self.fat, self.carbs))
+    # def print_data(self):
+    #     print("{}: {:.2f}, {:.2f}, {:.2f}, {:.2f}".format(self.name, self.energy, self.protein, self.fat, self.carbs))
 
     def get_data(self):
         return self.name, self.energy, self.protein, self.fat, self.carbs, self.magnesium, self.iron, self.sodium, self.thiamin, self.riboflavin, self.niacin
@@ -36,6 +36,11 @@ class Food:
 
 
 def create_table():
+    """Function for creating a new PrettyTable object.
+
+    Returns:
+        PrettyTable: New empty table with named columns.
+    """
     new_table = PrettyTable()
     new_table.title = "Nutrients"
     # new_table.add_row = ["Macronutrients", "Minerals", "Vitamins"]
@@ -46,6 +51,14 @@ def create_table():
 
 
 def recalculate_energy(original_value):
+    """Recalculates energy value from kJ to kcal.
+
+    Args:
+        original_value (float): Energy in kiloJoules.
+
+    Returns:
+        float: Energy in kilocalories.
+    """
     new_value = original_value / ENERGYCONVERSION
     print('Recalculating energy: {}kJ -> {:.2f}kcal\n'.format(original_value, new_value))
     return new_value
@@ -53,11 +66,27 @@ def recalculate_energy(original_value):
 
 
 def define_source_path(original_path):
+    """Modifies path to the source file.
+
+    Args:
+        original_path (string): Original name of the file.
+
+    Returns:
+        string: Modified name of the file.
+    """
     return './sources/' + original_path
 
 
 
 def check_data_contents(data_list):
+    """Checking if all elements of a list are None.
+
+    Args:
+        data_list (array): List of None and float values.
+
+    Returns:
+        boolean: True if exists at least one non-None value, else returns False.
+    """
     for item in data_list:
         if item is not None:
             return True
@@ -66,6 +95,14 @@ def check_data_contents(data_list):
 
 
 def analyze_page(new_page):
+    """Analyzing page of .xml document and searching for food/drink related content.
+
+    Args:
+        new_page (string): .xml page.
+
+    Returns:
+        Food/None: Newly created Food object if search was successful, else returns None.
+    """
 
     food_reg = r'\[\[Category\:.{0,20}?(F|f)ood.{0,20}?\]\]'
     drink_reg = r'\[\[Category\:.{0,20}?(D|d)drink.{0,20}?\]\]'
@@ -114,6 +151,16 @@ def analyze_page(new_page):
 
 # def analyze_file(file_path, index_list, indexing = True):
 def analyze_file(file_path, index_list = None, indexing = True):
+    """Analyzing .xml file and creating list of Foods/Drinks with nutritional information.
+
+    Args:
+        file_path (string): Path to the analyzed file.
+        index_list (array, optional): List of indexes if available. Defaults to None.
+        indexing (bool, optional): Turning on/off indexing functionality. Defaults to True.
+
+    Returns:
+        array: List of found and created Food objects.
+    """
 
     print(file_path)
 
@@ -151,11 +198,6 @@ def analyze_file(file_path, index_list = None, indexing = True):
     return results
 
 
-
-# CTRL + K + C = multiline comment
-# CTRL + K + U = multiline uncomment
-# CMD + Shift + P => kill all terminals
-
 # pool = multiprocessing.Pool(multiprocessing.cpu_count())
 
 
@@ -192,7 +234,7 @@ with open('index.txt', 'r', encoding='utf8') as file:
     # print(file_data)
 
     spark = SparkSession.builder.appName('vinf_project').master('local').getOrCreate()
-    rdd = spark.sparkContext.parallelize(file_data[0])
+    rdd = spark.sparkContext.parallelize(file_data[0], 8)
     tmp_foods_rdd = rdd.map(analyze_file)
 
     for arr in tmp_foods_rdd.collect():
