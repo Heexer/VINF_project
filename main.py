@@ -254,8 +254,8 @@ with open('index.txt', 'r', encoding='utf8') as file:
     else:
         print("\nIndexing is turned OFF.\n")
     
-    path_list = []
-    index_dict = {} 
+    path_list = []          # List of all paths from index.txt
+    index_dict = {}         # List of all indexes from index.txt
     foods = []              # List of all results
     index_line = True       # Flag signalizing line of indexes in index.txt file
     start = time.time()     # Time measurement start
